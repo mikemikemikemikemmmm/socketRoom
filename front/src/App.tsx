@@ -19,7 +19,8 @@ function App(props:{socket:Socket}) {
   //@ts-ignore
   const nowRoomData = useSelector((state: TState) => state.nowRoomData)
   console.log('app render',socket)
-  if (nowRoomData === undefined) {
+  console.log('nowRoomData',nowRoomData)
+  if (!nowRoomData) {
     return <Lobby socket={socket}/>
   } else {
     return <Room socket={socket}/>

@@ -181,6 +181,7 @@ class SocketManager {
     this.name = name
   }
   initListenerInLobby() {
+    console.log(546546)
     this.socket.emit("refreshRooms", this.io.getAllRoomsData())
     this.socket.emit("getUserName", this.name)
     this.socket.on("setUserName", name => this.setSocketName(name))

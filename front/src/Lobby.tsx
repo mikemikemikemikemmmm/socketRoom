@@ -42,6 +42,7 @@ export const Lobby = (props: IProps) => {
         })
     }
     const handleCreateRoom = () => {
+        console.log(2434)
         emitSetUserName()
         socket.emit('createRoom', createRoomName)
         socket.once('createRoomSuccess', (roomId: string) => {
