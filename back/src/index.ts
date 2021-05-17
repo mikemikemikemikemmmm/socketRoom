@@ -182,7 +182,8 @@ class SocketManager {
   }
   initListenerInLobby() {
     this.socket.emit("refreshRooms", this.io.getAllRoomsData())
-    this.socket.on("setUserName", name=>this.setSocketName(name))
+    this.socket.emit("getUserName", this.name)
+    this.socket.on("setUserName", name => this.setSocketName(name))
     this.socket.on("joinRoom", roomId => this.joinRoom(roomId))
     this.socket.on("createRoom", (roomId) => this.createRoom(roomId))
   }
@@ -224,7 +225,7 @@ class SocketManager {
     this.playerStatus = 'playing'
   }
   joinRoom(roomId: string, isCreater: boolean = false) {
-    if(!this.testName()){
+    if (!this.isNameVaild(this.name )) {
       return
     }
     if (!this.io.isRoomExist(roomId)) {
@@ -269,7 +270,7 @@ class SocketManager {
     this.room?.handleCreaterLeave()
   }
   createRoom(roomId: string) {
-    if(!this.testName()){
+    if (!this.isNameVaild(roomId) || !this.isNameVaild(this.name)) {
       return
     }
     const result = this.io.createRoom(roomId)
@@ -280,8 +281,8 @@ class SocketManager {
     this.socket.emit('createRoomSuccess', roomId)
     this.joinRoom(roomId, true)
   }
-  testName(){
-    if(this.name === ''){
+  isNameVaild(name:string) {
+    if (name === '') {
       this.socket.emit('nameIllegal')
       return false
     }

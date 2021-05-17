@@ -16,17 +16,21 @@ export const Lobby = (props: IProps) => {
         socket.on('refreshRooms', (roomsData) => {
             setRoomsData(roomsData)
         })
-
+        socket.on('getUserName', (name) => {
+            setUserName(name)
+        })
         socket.on('nameIllegal', () => {
             alert('name illegal')
         })
         return () => {
             socket.off('refreshRooms')
+            socket.off('getUserName')
             socket.off('nameIllegal')
         }
     }, [socket])
     const handleClickRoom = (roomId: string, isCreater = false) => {
         if (!isCreater) {
+            emitSetUserName()
             socket.emit('joinRoom', roomId)
         }
         socket.once('joinRoomSuccess', (roomData: IRoomToClient) => {
@@ -38,6 +42,7 @@ export const Lobby = (props: IProps) => {
         })
     }
     const handleCreateRoom = () => {
+        emitSetUserName()
         socket.emit('createRoom', createRoomName)
         socket.once('createRoomSuccess', (roomId: string) => {
             handleClickRoom(roomId, true)
@@ -54,11 +59,10 @@ export const Lobby = (props: IProps) => {
         }
         setCreateRoomName(e.target.value)
     }
+    const emitSetUserName = () => {
+        socket.emit('setUserName', userName)
+    }
     const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value === '') {
-            return
-        }
-        socket.emit('setUserName', e.target.value)
         setUserName(e.target.value)
     }
     return (
@@ -69,7 +73,7 @@ export const Lobby = (props: IProps) => {
             </div>
             now rooms
             <div className="">
-                <input type="text" name="" id="" onChange={(e) => handleChangeName(e)} placeholder="user name" />
+                <input type="text" name="" id="" value={userName} onChange={(e) => handleChangeName(e)} placeholder="user name" />
             </div>
             <ul>
                 {roomsData.map(roomData => {
