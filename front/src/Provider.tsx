@@ -1,17 +1,12 @@
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import App from './App'
-import { reducer } from './store/reducer'
-import {socket} from './socket'
-function ProviderHOC() {
+import { store } from './store/reducer'
+
+function ProviderHOC(props:{children:JSX.Element}) {
     //@ts-ignore
-    const store = createStore(reducer)
-    console.log('ProviderHOC render')
-    return <>
+    return (
         <Provider store={store}>
-            <App socket={socket} />
-        </Provider>
-    </>
+            {props.children}
+        </Provider>)
 
 }
 

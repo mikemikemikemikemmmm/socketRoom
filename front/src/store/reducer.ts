@@ -16,3 +16,4 @@ export function reducer(state = ininatailState, action: IAction) {
   }
 }
 export type TState = typeof ininatailState
+export const store = createStore(reducer)

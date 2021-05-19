@@ -2,10 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import ProviderHOC from './Provider';
-
+import { App } from './App';
+import {socket} from './socket'
 ReactDOM.render(
   <React.StrictMode>
-    <ProviderHOC/>
+    <ProviderHOC>
+      <App socket={socket}/>
+    </ProviderHOC>
   </React.StrictMode>,
   document.getElementById('root')
 );

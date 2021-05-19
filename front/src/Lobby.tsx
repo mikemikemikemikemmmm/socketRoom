@@ -42,7 +42,6 @@ export const Lobby = (props: IProps) => {
         })
     }
     const handleCreateRoom = () => {
-        console.log(2434)
         emitSetUserName()
         socket.emit('createRoom', createRoomName)
         socket.once('createRoomSuccess', (roomId: string) => {
@@ -67,20 +66,20 @@ export const Lobby = (props: IProps) => {
         setUserName(e.target.value)
     }
     return (
-        <section>
+        <section data-testid='Lobby'>
             <div>
-                <input type="text" name="" id="" onChange={(e) => handleCreateRoomName(e)} />
-                <button onClick={() => handleCreateRoom()}>create room</button>
+                <input data-testid='createInout' type="text" name="" id="" onChange={(e) => handleCreateRoomName(e)} />
+                <button data-testid='createBtn' onClick={() => handleCreateRoom()}>create room</button>
             </div>
             now rooms
             <div className="">
-                <input type="text" name="" id="" value={userName} onChange={(e) => handleChangeName(e)} placeholder="user name" />
+                <input type="text" name="" id="" value={userName} data-testid='nameInput' onChange={(e) => handleChangeName(e)} placeholder="user name" />
             </div>
             <ul>
                 {roomsData.map(roomData => {
-                    return <li key={roomData.id}>
-                        <span className="">{roomData.id}</span>
-                        <button style={{ display: 'inline-block' }} onClick={() => handleClickRoom(roomData.id)}>join room</button>
+                    return <li key={roomData.id} data-testid='roomData'>
+                        <span className="" data-testid='roomDataId'>{roomData.id}</span>
+                        <button data-testid='joinBtn' style={{ display: 'inline-block' }} onClick={() => handleClickRoom(roomData.id)}>join room</button>
                     </li>
                 })}
             </ul>

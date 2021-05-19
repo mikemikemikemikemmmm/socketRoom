@@ -14,12 +14,10 @@ export interface IRoomToClient {
     isReady: boolean;
   }[];
 }
-function App(props:{socket:Socket}) {
-  const {socket} =props
+export function App(props:{socket:Socket}) {
   //@ts-ignore
+  const socket = props.socket
   const nowRoomData = useSelector((state: TState) => state.nowRoomData)
-  console.log('app render',socket)
-  console.log('nowRoomData',nowRoomData)
   if (!nowRoomData) {
     return <Lobby socket={socket}/>
   } else {
@@ -27,4 +25,3 @@ function App(props:{socket:Socket}) {
   }
 }
 
-export default App;
