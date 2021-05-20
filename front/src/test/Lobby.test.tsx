@@ -1,19 +1,22 @@
-import ProviderHOC from '../Provider'
+
 import { Lobby } from '../Lobby'
 import { render, act, fireEvent, waitFor } from '@testing-library/react'
 import { socket } from '../socket'
 import { fakeData } from './fakeRoom'
-import { createServer } from 'http'
-import io from 'socket.io'
+import { createServer, } from 'http'
+import * as IO from 'socket.io'
 import Client, { Socket } from 'socket.io-client'
 import { App, IRoomToClient } from '../App'
+import { Provider } from 'react-redux'
+import { reducer, ininatailState, store } from '../store/reducer'
+import { createStore } from 'redux'
 
 describe('components', () => {
     it('should render without crash', () => {
         const { getByTestId } = render(
-            <ProviderHOC>
-                <Lobby socket={socket} />
-            </ProviderHOC>
+        <Provider store={store}>
+            <Lobby socket={socket} />
+        </Provider>
         )
         const LobbyComponent = getByTestId('Lobby')
         expect(LobbyComponent).toBeVisible()
@@ -23,9 +26,9 @@ describe('without serverSocket', () => {
     jest.mock('socket.io-client');
     it('change userName', () => {
         const { getByTestId } = render(
-            <ProviderHOC>
-                <Lobby socket={socket} />
-            </ProviderHOC>)
+        <Provider store={store}>
+            <Lobby socket={socket} />
+        </Provider>)
         const name = getByTestId('nameInput')
         const userName = 'mike2'
         act(() => {
@@ -35,9 +38,9 @@ describe('without serverSocket', () => {
     })
     it('change roomName', () => {
         const { getByTestId } = render(
-            <ProviderHOC>
+            <Provider store={store}>
                 <Lobby socket={socket} />
-            </ProviderHOC>)
+            </Provider>)
         const name = getByTestId('createInout')
         const userName = 'mike3'
         act(() => {
@@ -46,44 +49,37 @@ describe('without serverSocket', () => {
         expect(name).toHaveValue(userName)
     })
 })
-describe('need serverSocket', () => {
-    let serverSocket: Socket
+describe('event with serverSocket', () => {
+    let serverSocket: IO.Socket
     let clientSocket: Socket
     let getAllByTestId: (s: string) => HTMLElement[]
     let getByTestId: (s: string) => HTMLElement
-    let httpServer
-    let httpServerAddr
-    let ioServer
-    beforeAll((done) => {
-        httpServer = createServer().listen()
-        httpServerAddr = httpServer.listen().address();
-        ioServer = io(httpServer);
-        done()
-    })
+    let ioServer: IO.Server
+    let port: string
     beforeEach((done) => {
-        const httpServer = createServer();
-        io = new Server(httpServer);
-        httpServer.listen(() => {
-            const { port } = httpServer.address();
-            clientSocket = new Client(`http://localhost:${port}`);
-            io.on("connection", (socket) => {
-                serverSocket = socket;
-                clientSocket.on("connect", () => { });
+        const httpServer = createServer()
+        ioServer = new IO.Server(httpServer);
+        httpServer.listen()
+        port = httpServer.address().port;
+        clientSocket = new Client(`http://localhost:${port}`);
+        ioServer.on('connection', socket => {
+            serverSocket = socket
+            clientSocket.on("connect", () => {
+                const resetStore = createStore(reducer)
                 const container = render(
-                    <ProviderHOC>
+                    <Provider store={resetStore}>
                         <App socket={clientSocket} />
-                    </ProviderHOC>)
+                    </Provider>)
                 getAllByTestId = container.getAllByTestId
                 getByTestId = container.getByTestId
                 done()
             });
-        });
-    });
+        })
+    })
     afterEach(() => {
-        io.close();
-        io = undefined
+        ioServer.close();
         clientSocket.close();
-        clientSocket = undefined
+
     })
     it('when server emit refreshRooms,roomDataList should refresh', async () => {
         act(() => {
@@ -143,6 +139,7 @@ describe('need serverSocket', () => {
         })
     })
     it('click to join room', async () => {
+        const userNameInput = getByTestId('nameInput')
         const fakeRoomName = '123456'
         const fakeUserName = 'mikememm'
         const fakeCreaterName = 'mikememm22222'
@@ -157,6 +154,7 @@ describe('need serverSocket', () => {
             }]
         }
         act(() => {
+            fireEvent.change(userNameInput, { target: { value: fakeUserName } })
             serverSocket.emit('refreshRooms', [fakeRoomData])
         })
         await waitFor(() => {

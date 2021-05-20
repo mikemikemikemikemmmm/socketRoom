@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
-import ProviderHOC from './Provider';
 import { App } from './App';
+import { store } from './store/reducer'
+import { Provider } from 'react-redux'
+
 import {socket} from './socket'
 ReactDOM.render(
   <React.StrictMode>
-    <ProviderHOC>
+    <Provider store={store}>
       <App socket={socket}/>
-    </ProviderHOC>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

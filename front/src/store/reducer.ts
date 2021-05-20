@@ -4,16 +4,16 @@ interface IAction {
   type: string,
   value: unknown
 }
-const ininatailState = {
+export const ininatailState = {
   nowRoomData: undefined as IRoomToClient | undefined,
 }
-export function reducer(state = ininatailState, action: IAction) {
-  switch (action.type) {
+export function reducer(state = ininatailState, action?: IAction) {
+  switch (action?.type) {
     case "SET_ROOMDATA":
-      return { ...state, nowRoomData: action.value as IRoomToClient }
+      return { ...state, nowRoomData: action?.value as IRoomToClient }
     default:
       return state
   }
 }
 export type TState = typeof ininatailState
-export const store = createStore(reducer)
+export const store = createStore<TState,IAction,any,any>(reducer)
